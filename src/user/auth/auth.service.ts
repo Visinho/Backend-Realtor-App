@@ -20,7 +20,7 @@ interface SigninProps {
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async signup({ email, name, phone, password }: SignupProps) {
+  async signup({ email, name, phone, password }: SignupProps, usertype: UserType) {
     const userExists = await this.prismaService.user.findFirst({
       where: {
         email,
@@ -37,7 +37,7 @@ export class AuthService {
         name,
         phone,
         password: hashedPassword,
-        user_type: UserType.BUYER,
+        user_type: usertype,
       },
     });
 
