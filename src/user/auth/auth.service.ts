@@ -1,43 +1,79 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, HttpException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
-import { UserType } from "@prisma/client";
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+import { UserType } from '@prisma/client';
 
 interface SignupProps {
-    email: string;
-    password: string;
-    name: string;
-    phone: string;
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+}
+
+interface SigninProps {
+  email: string;
+  password: string;
 }
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-    async signup({email, name, phone, password}: SignupProps) {
-        const userExists = await this.prismaService.user.findFirst({
-            where: {
-                email 
-            }
-        })
-        if(userExists) {
-            throw new ConflictException("User already exists")
-        }
-        const hashedPassword = await bcrypt.hash(password, 10)
-
-        const newUser = await this.prismaService.user.create({
-            data: {
-                email, name, phone, password: hashedPassword, user_type: UserType.BUYER
-            }
-        });
-
-        const token = await jwt.sign({
-            name, id: newUser.id
-        }, process.env.JWT_TOKEN_KEY, {
-            expiresIn: 3600000
-        })
-
-        return newUser;
+  async signup({ email, name, phone, password }: SignupProps) {
+    const userExists = await this.prismaService.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (userExists) {
+      throw new ConflictException('User already exists');
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await this.prismaService.user.create({
+      data: {
+        email,
+        name,
+        phone,
+        password: hashedPassword,
+        user_type: UserType.BUYER,
+      },
+    });
+
+    const token = await this.generateJWT(name, newUser.id);
+
+    return newUser;
+  }
+
+  async signin({ email, password }: SigninProps) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      throw new HttpException('Invalid Credentials', 400);
+    }
+    const hashedPassword = user.password;
+
+    const isValidPassword = await bcrypt.compare(password, hashedPassword);
+    if (!isValidPassword) {
+      throw new HttpException('Invalid Credentials', 400);
+    }
+    return await this.generateJWT(user.name, user.id);
+  }
+
+  private generateJWT(name: string, id: number) {
+    return jwt.sign(
+        {
+          name,
+          id,
+        },
+        process.env.JWT_TOKEN_KEY,
+        {
+          expiresIn: 3600000,
+        },
+      );
+  }
 }
