@@ -1,8 +1,8 @@
+import { UserType } from '@prisma/client';
 import { Injectable, ConflictException, HttpException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { UserType } from '@prisma/client';
 
 interface SignupProps {
   email: string;
@@ -75,5 +75,10 @@ export class AuthService {
           expiresIn: 3600000,
         },
       );
+  }
+
+  generateProductKey(email: string, UserType: UserType) {
+    const string = `${email}-${UserType}-${process.env.PRODUCT_KEY_SECRET}`
+    return bcrypt.hash(string, 10);
   }
 }
