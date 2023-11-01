@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
 import { HomeService } from './home.service';
+import { HomeResponseDto } from './dto/home.dto';
 
 @Controller('home')
 export class HomeController {
@@ -8,7 +9,7 @@ export class HomeController {
 
 
     @Get()
-    getHomes() {
+    getHomes(): Promise<HomeResponseDto[]> {
         return this.homeService.getHomes();
     }
 
