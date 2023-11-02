@@ -46,4 +46,29 @@ export class HomeService {
         return new HomeResponseDto(fetchedHome)
     });
   }
+  
+
+  async getHomeById(id: number) {
+    // Query the database to find a home by its ID
+    const home = await this.prismaService.home.findUnique({
+      where: {
+        id: id, 
+      },
+    });
+
+    if (!home) {
+      throw new NotFoundException(`Home with ID ${id} not found`);
+    }
+    return home;
+  }
+
+
+
+
+
+
+
+
+
+
 }
