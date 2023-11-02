@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HomeResponseDto } from './dto/home.dto';
+import { PropertyType } from '@prisma/client';
 
 @Injectable()
 export class HomeService {
@@ -23,6 +24,14 @@ export class HomeService {
           take: 1,
         },
       },
+      where: {
+        city: "Owerri",
+        price: {
+            gte: 10000,
+            lte: 2000000
+        },
+        propertyType: PropertyType.RESIDENTIAL
+      }
     });
     return homes.map((home) => {
         const fetchedHome = {...home, image: home.images[0].url}
