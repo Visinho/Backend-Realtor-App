@@ -65,8 +65,9 @@ async getHomeById(id: number): Promise<HomeResponseDto> {
     if (!home) {
       throw new NotFoundException(`Home with ID ${id} not found`);
     }
-
-    return new HomeResponseDto(home);
+    const getHome = {...home, image: home.images[0].url}
+    delete getHome.images
+    return new HomeResponseDto(getHome);
   }
 
 
