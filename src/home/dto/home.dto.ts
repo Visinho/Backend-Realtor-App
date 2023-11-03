@@ -53,6 +53,8 @@ export class HomeResponseDto {
 }
 
 class Image {
+    @IsString()
+    @IsNotEmpty()
     url: string;
 }
 
@@ -73,7 +75,7 @@ export class CreateHomeDto {
     @IsNotEmpty()
     city: string;
 
-    @IsString()
+    @IsNumber()
     @IsPositive()
     price: number;
 
