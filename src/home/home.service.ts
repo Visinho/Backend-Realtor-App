@@ -91,7 +91,7 @@ async getHomeById(id: number): Promise<HomeResponseDto> {
     return new HomeResponseDto(getHome);
   }
 
-async createHome({address, numberOfBathrooms, numberOfBedrooms, city, landSize, price, propertyType, images}: CreateHomeParam) {
+async createHome({address, numberOfBathrooms, numberOfBedrooms, city, landSize, price, propertyType, images}: CreateHomeParam, userId: number) {
     const home = await this.prismaService.home.create({
         data: {
             address,
@@ -101,7 +101,7 @@ async createHome({address, numberOfBathrooms, numberOfBedrooms, city, landSize, 
             land_size: landSize,
             propertyType,
             price,
-            realtor_id: 4
+            realtor_id: userId
         }
     })
     const homeImages = images.map(image => {

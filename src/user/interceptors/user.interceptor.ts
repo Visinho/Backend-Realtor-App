@@ -1,6 +1,13 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
 
+export interface UserData {
+    name: string,
+    id: number,
+    iat: number,
+    exp: number
+}
+
 
 export class UserInterceptor implements NestInterceptor {
     async intercept(
