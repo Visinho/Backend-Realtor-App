@@ -43,7 +43,7 @@ export class AuthService {
 
     const token = await this.generateJWT(name, newUser.id);
 
-    return newUser;
+    return token;
   }
 
   async signin({ email, password }: SigninProps) {
