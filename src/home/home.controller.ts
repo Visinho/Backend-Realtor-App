@@ -70,11 +70,23 @@ export class HomeController {
     }
 
     @Roles(UserType.BUYER)
-    @Post("/inquire/:id")
+    @Post("/:id/inquire")
     inquire(
         @Param("id", ParseIntPipe) homeId: number,  @User() user: UserData,
         @Body() {message}: MessageDto
     ){
         return this.homeService.inquire(user, message, homeId)
+    }
+
+    @Roles(UserType.REALTOR)
+    @Get("/:id/messages")
+    async getHomeMessages(
+        @Param("id", ParseIntPipe) homeId: number,  @User() user: UserData,
+    ){
+        const realtor = await this.homeService.getRealtorByHomeId(homeId);
+        if(realtor.id !== user.id) {
+            throw new UnauthorizedException()
+        }
+        return this.homeService.getHomeMessages(homeId)
     }
 }
