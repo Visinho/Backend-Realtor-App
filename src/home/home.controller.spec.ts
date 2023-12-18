@@ -3,6 +3,7 @@ import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PropertyType } from '@prisma/client';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 const mockUser = {
   id: 53,
@@ -59,8 +60,40 @@ describe('HomeController', () => {
  });
 
  describe("updateHome", () => {
+
+  const mockUserData = {
+    name: "Elvis",
+    id: 30,
+    iat: 1,
+    exp: 2 
+  }
+
+  const mockUpdateHomeParams = {
+    address: "Eziobodo RadioNodeList, futo",
+    city: "Toronto",
+    landSize: 4444,
+    price: 150000,
+    propertyType: PropertyType.RESIDENTIAL,
+    numberOfBedrooms: 3,
+    numberOfBathrooms: 2.5,
+  }
+
   it("Should throw unauthorized error if realtor did not create home", async () => {
-    // await controller.updateHomeById(5, )
+    // await controller.updateHomeById(5, mockCreateHomeParams, mockUserData);
+
+    await expect(controller.updateHomeById(5, mockUpdateHomeParams, mockUserData)).rejects.toThrowError(
+      UnauthorizedException
+    )
   })
- })
+
+  it("Should update home if realtor id is valid", async () => {
+    const mockUpdateHome = jest.fn().mockReturnValue(mockhome)
+
+    jest.spyOn(homeService, "updateHomeById").mockImplementation(mockUpdateHome)
+
+    await controller.updateHomeById(5, mockUpdateHomeParams, {...mockUserData, id: 53})
+
+    expect(mockUpdateHome).toBeCalled();
+  });
+ });
 });
