@@ -34,6 +34,16 @@ interface UpdateHomeParam {
     propertyType?: PropertyType;
 }
 
+export const homeSelect = {
+    id: true,
+    address: true,
+    city: true,
+    price: true,
+    propertyType: true,
+    number_of_bathrooms: true,
+    number_of_bedrooms: true
+}
+
 @Injectable()
 export class HomeService {
   constructor(private readonly prismaService: PrismaService) {}
