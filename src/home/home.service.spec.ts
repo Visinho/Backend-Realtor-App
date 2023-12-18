@@ -40,7 +40,9 @@ const mockImages = [
     id: 2,
     url: "src2"
   }
-]
+];
+
+
 
 describe('HomeService', () => {
   let service: HomeService;
@@ -56,7 +58,7 @@ describe('HomeService', () => {
             create: jest.fn().mockReturnValue(mockhome)
           },
           image: {
-            createMany: jest.fn().mockReturnValue()
+            createMany: jest.fn().mockReturnValue(mockImages)
           }
         }
       }],
@@ -111,5 +113,39 @@ describe('HomeService', () => {
     })
   })
 
-  describe
+  describe("createHome", () => {
+    const mockCreateHomeParams = {
+      address: "Eziobodo RadioNodeList, futo",
+      city: "Toronto",
+      landSize: 4444,
+      price: 150000,
+      propertyType: PropertyType.RESIDENTIAL,
+      numberOfBedrooms: 3,
+      numberOfBathrooms: 2.5,
+      images: [{
+        url: "src1"
+      }]
+    }
+
+    it("Should call prisma home.create with the correct payload", async () => {
+      const mockCreateHome = jest.fn().mockReturnValue(mockhome)
+
+      jest.spyOn(prismaService.home, "create").mockImplementation(mockCreateHome)
+
+      await service.createHome(mockCreateHomeParams, 5)
+
+      expect(mockCreateHome).toBeCalledWith({
+        data: {
+            address: "Eziobodo RadioNodeList, futo",
+            city: "Toronto",
+            land_size: 4444,
+            price: 150000,
+            propertyType: PropertyType.RESIDENTIAL,
+            number_of_bedrooms: 3,
+            number_of_bathrooms: 2.5,
+            realtor_id: 5
+        }
+      })
+    })
+  })
 });
